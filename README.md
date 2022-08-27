@@ -12,6 +12,6 @@ CREATE YOUR OWN ICONS USING POWERPOINT:   https://github.com/rising-dancho/custo
 
 RECOLORABLE ICONS:                        https://icons8.com/icons/set/list-number
 
-RESIZE IMAGES TO 24x24 ICON SIZES:        https://www.img2go.com/
+RESIZE IMAGES TO 24x24 ICON SIZES:        https://www.img2go.com/resize-image
 
 TRANSPARENT BACKGROUND:                   https://www.remove.bg/
