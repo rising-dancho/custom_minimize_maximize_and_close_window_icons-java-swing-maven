@@ -1,5 +1,5 @@
 # custom_minimize_maximize_and_close_window_icons-java-netbeans-
-i made some simple custom minimize, maximize, and close icons window functionalities for desktop applications using java swing
+i made some simple custom minimize, maximize, and close icons using microsoft powerpoint, check it out!
 
 - check the icons/resources folder to see the powerpoint file that i used to create my own icons
 
