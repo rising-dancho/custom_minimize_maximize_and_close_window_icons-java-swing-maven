@@ -4,6 +4,7 @@ i made some simple custom minimize, maximize, and close icons window functionali
 - check the icons/resources folder to see the powerpoint file that i used to create my own icons
 
 
+![image](https://user-images.githubusercontent.com/43742265/187011262-793e2f71-f2d5-46a5-a550-e898593be3ed.png)
 
 
 
