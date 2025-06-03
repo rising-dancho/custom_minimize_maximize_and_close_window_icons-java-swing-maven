@@ -43,9 +43,9 @@ public class Main extends JFrame {
         maximizeButton = new JButton();
         closeButton = new JButton();
 
-        minimizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/defaults/minimize_def.png")));
-        maximizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/defaults/collapse_def.png")));
-        closeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/defaults/close_def.png")));
+        minimizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/minimize_def.png")));
+        maximizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/maximize_def.png")));
+        closeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/close_def.png")));
 
         // Button size and style
         Dimension btnSize = new Dimension(30, 30);
@@ -92,12 +92,12 @@ public class Main extends JFrame {
         closeButton.setToolTipText("Close");
         closeButton.addActionListener(e -> System.exit(0));
         closeButton.addMouseListener(new HoverIconAdapter(closeButton,
-                "close.png", "close.png"));
+                "close_def.png", "close_hover.png"));
 
         minimizeButton.setToolTipText("Minimize");
         minimizeButton.addActionListener(e -> setState(JFrame.ICONIFIED));
         minimizeButton.addMouseListener(new HoverIconAdapter(minimizeButton,
-                "minimize.png", "minimize.png"));
+                "minimize_def.png", "minimize_hover.png"));
 
         maximizeButton.setToolTipText("Maximize / Restore");
         maximizeButton.addActionListener(e -> {
@@ -108,7 +108,7 @@ public class Main extends JFrame {
             }
         });
         maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton,
-                "maximize.png", "maximize.png"));
+                "maximize_def.png", "maximize_hover.png"));
     }
 
     // ✅ Inner class (not a method!)
