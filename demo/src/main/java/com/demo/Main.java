@@ -100,6 +100,7 @@ public class Main extends JFrame {
                 "minimize_def.png", "minimize_hover.png"));
 
         maximizeButton.setToolTipText("Maximize / Restore");
+        // Add a default dummy listener before setting up hover behavior
         maximizeButton.addActionListener(e -> {
             if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
                 setExtendedState(JFrame.NORMAL);
@@ -109,6 +110,29 @@ public class Main extends JFrame {
         });
         maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton,
                 "maximize_def.png", "maximize_hover.png"));
+
+        toggleMaximizeRestore(); // then override it properly
+    }
+
+    private void toggleMaximizeRestore() {
+        boolean isMaximized = getExtendedState() == JFrame.MAXIMIZED_BOTH;
+
+        setExtendedState(isMaximized ? JFrame.NORMAL : JFrame.MAXIMIZED_BOTH);
+
+        // Update icon and hover behavior
+        String defIcon = isMaximized ? "maximize_def.png" : "collapse_def.png";
+        String hoverIcon = isMaximized ? "maximize_hover.png" : "collapse_hover.png";
+
+        maximizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/" + defIcon)));
+
+        // Remove previous hover listeners to prevent stacking
+        for (MouseListener l : maximizeButton.getMouseListeners()) {
+            if (l instanceof HoverIconAdapter) {
+                maximizeButton.removeMouseListener(l);
+            }
+        }
+
+        maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton, defIcon, hoverIcon));
     }
 
     // ✅ Inner class (not a method!)
@@ -123,12 +147,15 @@ public class Main extends JFrame {
             URL defaultUrl = getClass().getResource("/demo/images/" + defaultIconName);
             URL hoverUrl = getClass().getResource("/demo/images/" + hoverIconName);
 
-            if (defaultUrl == null || hoverUrl == null) {
-                throw new IllegalArgumentException("Icon not found: " + defaultIconName + " or " + hoverIconName);
+            if (defaultUrl == null) {
+                System.err.println("⚠️ Missing default icon: " + defaultIconName);
+            }
+            if (hoverUrl == null) {
+                System.err.println("⚠️ Missing hover icon: " + hoverIconName);
             }
 
-            defaultIcon = new ImageIcon(defaultUrl);
-            hoverIcon = new ImageIcon(hoverUrl);
+            defaultIcon = defaultUrl != null ? new ImageIcon(defaultUrl) : new ImageIcon();
+            hoverIcon = hoverUrl != null ? new ImageIcon(hoverUrl) : new ImageIcon();
         }
 
         @Override
