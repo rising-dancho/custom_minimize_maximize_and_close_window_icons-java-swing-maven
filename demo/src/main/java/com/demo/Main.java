@@ -21,6 +21,9 @@ public class Main extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         initComponents();
+
+        // Listen for window state changes (maximize/restore)
+        addWindowStateListener(e -> updateMaximizeButtonIcon());
     }
 
     private void initComponents() {
@@ -111,28 +114,27 @@ public class Main extends JFrame {
         maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton,
                 "maximize_def.png", "maximize_hover.png"));
 
-        toggleMaximizeRestore(); // then override it properly
+        updateMaximizeButtonIcon(); // set correct icon on startup
     }
 
-    private void toggleMaximizeRestore() {
-        boolean isMaximized = getExtendedState() == JFrame.MAXIMIZED_BOTH;
+    private void updateMaximizeButtonIcon() {
 
-        setExtendedState(isMaximized ? JFrame.NORMAL : JFrame.MAXIMIZED_BOTH);
-
-        // Update icon and hover behavior
-        String defIcon = isMaximized ? "maximize_def.png" : "collapse_def.png";
-        String hoverIcon = isMaximized ? "maximize_hover.png" : "collapse_hover.png";
+        boolean isMaximized = (getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH;
+        String defIcon = isMaximized ? "collapse_def.png" : "maximize_def.png";
+        String hoverIcon = isMaximized ? "collapse_hover.png" : "maximize_hover.png";
 
         maximizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/" + defIcon)));
 
         // Remove previous hover listeners to prevent stacking
         for (MouseListener l : maximizeButton.getMouseListeners()) {
             if (l instanceof HoverIconAdapter) {
+
                 maximizeButton.removeMouseListener(l);
+
             }
         }
-
         maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton, defIcon, hoverIcon));
+
     }
 
     // ✅ Inner class (not a method!)
