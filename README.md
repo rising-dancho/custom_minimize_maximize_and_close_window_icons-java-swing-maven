@@ -15,3 +15,8 @@ RECOLORABLE ICONS:                        https://icons8.com/icons/set/list-numb
 RESIZE IMAGES TO 24x24 ICON SIZES:        https://www.img2go.com/resize-image
 
 TRANSPARENT BACKGROUND:                   https://www.remove.bg/
+
+# maven java swing project demo
+
+https://github.com/user-attachments/assets/983af787-8cce-44c6-83fb-4fb507ef17bd
+
