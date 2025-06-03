@@ -1,4 +1,4 @@
-# custom_minimize_maximize_and_close_window_icons-java-netbeans-
+# custom_minimize_maximize_and_close_window_icons-java-swing-maven
 i made some simple custom minimize, maximize, and close icons using microsoft powerpoint, check it out!
 
 - check the Icons/resources/icons.pptx folder to see the powerpoint file that i used to create my own icons
