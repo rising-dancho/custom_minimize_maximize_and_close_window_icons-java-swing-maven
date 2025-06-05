@@ -14,7 +14,7 @@ public class Main extends JFrame {
     private Point initialClick;
 
     public Main() {
-        setTitle("Difference Checker");
+        setTitle("Demo");
         setUndecorated(true);
         setSize(800, 600);
         setLocationRelativeTo(null);
