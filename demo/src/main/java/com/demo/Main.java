@@ -1,34 +1,53 @@
 package com.demo;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.net.URL;
 
-public class Main extends JFrame {
+import javax.swing.*;
+import java.awt.event.MouseEvent;
+
+public class Main extends JPanel {
+	private ComponentMover componentMover;
 
 	private JPanel header;
 	private JButton closeButton;
 	private JButton minimizeButton;
 	private JButton maximizeButton;
-	private Point initialClick;
+	private JFrame parentFrame;
 
-	public Main() {
-		setTitle("Demo");
-		setUndecorated(true);
-		setSize(800, 600);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		initComponents();
-
-		// Listen for window state changes (maximize/restore)
-		addWindowStateListener(e -> updateMaximizeButtonIcon());
+	public void setParentFrame(JFrame frame) {
+		this.parentFrame = frame;
 	}
 
-	private void initComponents() {
-		JPanel contentPane = new JPanel(new BorderLayout());
-		setContentPane(contentPane);
+	Main() {
+		componentMover = new ComponentMover(Window.class);
+
+		setLayout(new BorderLayout());
+
+		// Only add the title bar at the top
+		JComponent top = createTopPanel();
+		add(top, BorderLayout.NORTH);
+
+		// No other components are added!
+	}
+
+	private JComponent createTopPanel() {
+		JPanel titleBar = new JPanel(new BorderLayout());
+		componentMover.registerComponent(titleBar);
+
+		JLabel title = new JLabel("Demo");
+		ImageIcon icon = new ImageIcon(getClass().getResource("/demo/images/logo/logo_24x24.png"));
+		title.setForeground(new Color(0xEEEEEE));
+		// add padding
+		title.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+		title.setFont(new Font("Segoe UI", Font.BOLD, 16));
+		title.setForeground(new Color(0xEEEEEE));
+		title.setIcon(icon);
+		title.setIconTextGap(10); // spacing between icon and text
+		title.setHorizontalTextPosition(SwingConstants.RIGHT); // text to the right of icon
+		title.setVerticalTextPosition(SwingConstants.CENTER); // vertical alignments
 
 		// Header
 		header = new JPanel();
@@ -62,33 +81,14 @@ public class Main extends JFrame {
 		}
 
 		// Add the buttons to the header
+		header.add(title, BorderLayout.LINE_START);
 		header.add(iconminmaxclose, BorderLayout.LINE_END);
-
-		contentPane.add(header, BorderLayout.NORTH);
+		titleBar.add(header, BorderLayout.NORTH);
 
 		// Listeners
-		attachDragListener(header);
 		attachControlListeners();
-	}
 
-	private void attachDragListener(Component dragTarget) {
-		dragTarget.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				initialClick = e.getPoint();
-			}
-		});
-
-		dragTarget.addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseDragged(MouseEvent e) {
-				int thisX = getLocation().x;
-				int thisY = getLocation().y;
-
-				int xMoved = e.getX() - initialClick.x;
-				int yMoved = e.getY() - initialClick.y;
-
-				setLocation(thisX + xMoved, thisY + yMoved);
-			}
-		});
+		return titleBar;
 	}
 
 	private void attachControlListeners() {
@@ -98,17 +98,24 @@ public class Main extends JFrame {
 				"close_def.png", "close_hover.png"));
 
 		minimizeButton.setToolTipText("Minimize");
-		minimizeButton.addActionListener(e -> setState(JFrame.ICONIFIED));
+		minimizeButton.addActionListener(e -> {
+			if (parentFrame != null) {
+				parentFrame.setState(JFrame.ICONIFIED);
+			}
+		});
 		minimizeButton.addMouseListener(new HoverIconAdapter(minimizeButton,
 				"minimize_def.png", "minimize_hover.png"));
 
 		maximizeButton.setToolTipText("Maximize / Restore");
 		// Add a default dummy listener before setting up hover behavior
 		maximizeButton.addActionListener(e -> {
-			if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-				setExtendedState(JFrame.NORMAL);
-			} else {
-				setExtendedState(JFrame.MAXIMIZED_BOTH);
+			if (parentFrame != null) {
+				if (parentFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+					parentFrame.setExtendedState(JFrame.NORMAL);
+				} else {
+					parentFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+				updateMaximizeButtonIcon(); // refresh icon based on new state
 			}
 		});
 		maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton,
@@ -118,23 +125,22 @@ public class Main extends JFrame {
 	}
 
 	private void updateMaximizeButtonIcon() {
+		if (parentFrame == null)
+			return;
 
-		boolean isMaximized = (getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH;
+		boolean isMaximized = (parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH;
 		String defIcon = isMaximized ? "collapse_def.png" : "maximize_def.png";
 		String hoverIcon = isMaximized ? "collapse_hover.png" : "maximize_hover.png";
 
 		maximizeButton.setIcon(new ImageIcon(getClass().getResource("/demo/images/" + defIcon)));
 
-		// Remove previous hover listeners to prevent stacking
 		for (MouseListener l : maximizeButton.getMouseListeners()) {
 			if (l instanceof HoverIconAdapter) {
-
 				maximizeButton.removeMouseListener(l);
-
 			}
 		}
-		maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton, defIcon, hoverIcon));
 
+		maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton, defIcon, hoverIcon));
 	}
 
 	// ✅ Inner class (not a method!)
@@ -172,14 +178,30 @@ public class Main extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(() -> {
-			Main f = new Main();
-			f.setVisible(true);
-			ComponentResizer cr = new ComponentResizer();
-			cr.registerComponent(f);
-			cr.setMinimumSize(new Dimension(400, 300)); // optional
-			cr.setMaximumSize(Toolkit.getDefaultToolkit().getScreenSize()); // optional
-			cr.setSnapSize(new Dimension(20, 20)); // optional
-		});
+		SwingUtilities.invokeLater(Main::createAndShowGUI);
 	}
+
+	public static void createAndShowGUI() {
+		JFrame frame = new JFrame();
+		frame.setUndecorated(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(800, 600);
+
+		Main demo = new Main();
+		demo.setParentFrame(frame);
+
+		// Add invisible padding around the main panel for resize detection
+		JPanel wrapper = new JPanel(new BorderLayout());
+		wrapper.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 3)); // Acts like visible resize margin
+		wrapper.setBackground(new Color(36, 37, 38));
+		wrapper.add(demo, BorderLayout.CENTER);
+
+		frame.setContentPane(wrapper);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+
+		ComponentResizer cr = new ComponentResizer();
+		cr.registerComponent(frame);
+	}
+
 }
