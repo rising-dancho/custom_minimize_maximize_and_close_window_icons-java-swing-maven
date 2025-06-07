@@ -8,7 +8,7 @@ i made some simple custom minimize, maximize, and close icons using microsoft po
 
 
 
-## CREATE YOUR OWN ICONS USING POWERPOINT (open the icons.pptx):   [https://github.com/rising-dancho/custom_minimize_maximize_and_close_window_icons-java-netbeans-/tree/main/Icons/resources](https://github.com/rising-dancho/custom_minimize_maximize_and_close_window_icons-java-swing-maven/tree/main/Icons/resources)
+## CREATE YOUR OWN ICONS USING POWERPOINT (open the icons.pptx): https://github.com/rising-dancho/custom_minimize_maximize_and_close_window_icons-java-swing-maven/tree/main/custom%20icons%20using%20ms%20powerpoint/resources
 
 RECOLORABLE ICONS:                        https://icons8.com/icons/set/list-number
 
