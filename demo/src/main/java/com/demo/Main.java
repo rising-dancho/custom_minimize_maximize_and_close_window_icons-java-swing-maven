@@ -3,6 +3,7 @@ package com.demo;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.net.URL;
 
 import javax.swing.*;
@@ -16,6 +17,9 @@ public class Main extends JPanel {
 	private JButton minimizeButton;
 	private JButton maximizeButton;
 	private JFrame parentFrame;
+	private boolean wasMaximizedOnDrag = false;
+	private Point initialClickPoint = null;
+	private Dimension previousSize = new Dimension(1080, 720); // default window size fallback
 
 	public void setParentFrame(JFrame frame) {
 		this.parentFrame = frame;
@@ -84,6 +88,45 @@ public class Main extends JPanel {
 		header.add(title, BorderLayout.LINE_START);
 		header.add(iconminmaxclose, BorderLayout.LINE_END);
 		titleBar.add(header, BorderLayout.NORTH);
+		titleBar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (parentFrame != null && (parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
+					wasMaximizedOnDrag = true;
+					initialClickPoint = e.getPoint(); // capture where the user clicked
+				} else {
+					wasMaximizedOnDrag = false;
+					initialClickPoint = null;
+				}
+			}
+		});
+
+		titleBar.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (parentFrame != null && wasMaximizedOnDrag) {
+					// Calculate ratio of click point to frame width
+					double ratioX = (double) initialClickPoint.x / parentFrame.getWidth();
+
+					// Restore window
+					parentFrame.setExtendedState(JFrame.NORMAL);
+
+					// Set new window size to the default window size fallback
+					int width = previousSize.width;
+					int height = previousSize.height;
+					parentFrame.setSize(width, height);
+
+					// Move window to match the cursor's position
+					Point mouseScreen = e.getLocationOnScreen();
+					int newX = (int) (mouseScreen.x - ratioX * width);
+					int newY = mouseScreen.y - initialClickPoint.y;
+
+					parentFrame.setLocation(newX, newY);
+
+					wasMaximizedOnDrag = false;
+				}
+			}
+		});
 
 		// Listeners
 		attachControlListeners();
@@ -107,15 +150,16 @@ public class Main extends JPanel {
 				"minimize_def.png", "minimize_hover.png"));
 
 		maximizeButton.setToolTipText("Maximize / Restore");
-		// Add a default dummy listener before setting up hover behavior
+		// Save previous size before maximizing (optional, improve behavior)
 		maximizeButton.addActionListener(e -> {
 			if (parentFrame != null) {
-				if (parentFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+				if ((parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
 					parentFrame.setExtendedState(JFrame.NORMAL);
 				} else {
+					previousSize = parentFrame.getSize();
 					parentFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 				}
-				updateMaximizeButtonIcon(); // refresh icon based on new state
+				updateMaximizeButtonIcon();
 			}
 		});
 		maximizeButton.addMouseListener(new HoverIconAdapter(maximizeButton,
@@ -185,7 +229,7 @@ public class Main extends JPanel {
 		JFrame frame = new JFrame();
 		frame.setUndecorated(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 600);
+		frame.setSize(1080, 720);
 
 		Main demo = new Main();
 		demo.setParentFrame(frame);
