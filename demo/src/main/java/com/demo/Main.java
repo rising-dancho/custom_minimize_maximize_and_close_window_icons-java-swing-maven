@@ -3,7 +3,6 @@ package com.demo;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.net.URL;
 
 import javax.swing.*;
@@ -17,8 +16,6 @@ public class Main extends JPanel {
 	private JButton minimizeButton;
 	private JButton maximizeButton;
 	private JFrame parentFrame;
-	private boolean wasMaximizedOnDrag = false;
-	private Point initialClickPoint = null;
 
 	static private int windowWidth = 1024;
 	static private int windowHeight = 768;
@@ -109,32 +106,43 @@ public class Main extends JPanel {
 			}
 		});
 
-		titleBar.addMouseMotionListener(new MouseMotionAdapter() {
-			@Override
-			public void mouseDragged(MouseEvent e) {
-				if (parentFrame != null && wasMaximizedOnDrag) {
-					// Calculate ratio of click point to frame width
-					double ratioX = (double) initialClickPoint.x / parentFrame.getWidth();
+		// COLLAPSE WINDOW WHEN TITLEBAR IS DRAGGED DURING MAXIMIZED
+		// titleBar.addMouseListener(new MouseAdapter() {
+		// 	@Override
+		// 	public void mousePressed(MouseEvent e) {
+		// 		if (parentFrame != null && (parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
+		// 			wasMaximizedOnDrag = true;
+		// 			initialClickPoint = e.getPoint(); // capture where the user clicked
+		// 		} else {
+		// 			wasMaximizedOnDrag = false;
+		// 			initialClickPoint = null;
+		// 		}
+		// 	}
+		// });
 
-					// Restore window
-					parentFrame.setExtendedState(JFrame.NORMAL);
+		// titleBar.addMouseMotionListener(new MouseMotionAdapter() {
+		// 	@Override
+		// 	public void mouseDragged(MouseEvent e) {
+		// 		if (parentFrame != null && wasMaximizedOnDrag) {
+		// 			Point mouseScreen = e.getLocationOnScreen();
 
-					// Set new window size to the default window size fallback
-					int width = previousSize.width;
-					int height = previousSize.height;
-					parentFrame.setSize(width, height);
+		// 			// Restore window first
+		// 			parentFrame.setExtendedState(JFrame.NORMAL);
 
-					// Move window to match the cursor's position
-					Point mouseScreen = e.getLocationOnScreen();
-					int newX = (int) (mouseScreen.x - ratioX * width);
-					int newY = mouseScreen.y - initialClickPoint.y;
+		// 			// Restore previous size
+		// 			int width = previousSize.width;
+		// 			int height = previousSize.height;
+		// 			parentFrame.setSize(width, height);
 
-					parentFrame.setLocation(newX, newY);
+		// 			// Set window location so the mouse is centered in the window
+		// 			int newX = mouseScreen.x - width / 2;
+		// 			int newY = mouseScreen.y - header.getHeight() / 2;
+		// 			parentFrame.setLocation(newX, newY);
 
-					wasMaximizedOnDrag = false;
-				}
-			}
-		});
+		// 			wasMaximizedOnDrag = false;
+		// 		}
+		// 	}
+		// });
 
 		// Listeners
 		attachControlListeners();
@@ -257,3 +265,7 @@ public class Main extends JPanel {
 	}
 
 }
+
+
+// HELPER CLASSES REPOSITORY: https://github.com/rising-dancho/tips4java/tree/main/source
+// tips4java forum: https://tips4java.wordpress.com/category/package/swing/page/3/
