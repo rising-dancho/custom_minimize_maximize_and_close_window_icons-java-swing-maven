@@ -19,7 +19,10 @@ public class Main extends JPanel {
 	private JFrame parentFrame;
 	private boolean wasMaximizedOnDrag = false;
 	private Point initialClickPoint = null;
-	private Dimension previousSize = new Dimension(1080, 720); // default window size fallback
+
+	static private int windowWidth = 1024;
+	static private int windowHeight = 768;
+	private Dimension previousSize = new Dimension(windowWidth, windowHeight); // default window size fallback
 
 	public void setParentFrame(JFrame frame) {
 		this.parentFrame = frame;
@@ -88,15 +91,20 @@ public class Main extends JPanel {
 		header.add(title, BorderLayout.LINE_START);
 		header.add(iconminmaxclose, BorderLayout.LINE_END);
 		titleBar.add(header, BorderLayout.NORTH);
+
+		// COLLAPSE WINDOW WHEN TITLEBAR IS DRAGGED DURING MAXIMIZED
 		titleBar.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent e) {
-				if (parentFrame != null && (parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
-					wasMaximizedOnDrag = true;
-					initialClickPoint = e.getPoint(); // capture where the user clicked
-				} else {
-					wasMaximizedOnDrag = false;
-					initialClickPoint = null;
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && parentFrame != null && SwingUtilities.isLeftMouseButton(e)) {
+					if ((parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
+						parentFrame.setExtendedState(JFrame.NORMAL);
+						parentFrame.setSize(previousSize);
+					} else {
+						previousSize = parentFrame.getSize();
+						parentFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+					}
+					updateMaximizeButtonIcon();
 				}
 			}
 		});
@@ -229,14 +237,14 @@ public class Main extends JPanel {
 		JFrame frame = new JFrame();
 		frame.setUndecorated(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1080, 720);
+		frame.setSize(windowWidth, windowHeight);
 
 		Main demo = new Main();
 		demo.setParentFrame(frame);
 
 		// Add invisible padding around the main panel for resize detection
 		JPanel wrapper = new JPanel(new BorderLayout());
-		wrapper.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 3)); // Acts like visible resize margin
+		wrapper.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4)); // Acts like a visible resize margin
 		wrapper.setBackground(new Color(36, 37, 38));
 		wrapper.add(demo, BorderLayout.CENTER);
 
