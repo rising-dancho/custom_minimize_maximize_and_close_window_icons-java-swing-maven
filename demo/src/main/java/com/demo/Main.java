@@ -108,40 +108,41 @@ public class Main extends JPanel {
 
 		// COLLAPSE WINDOW WHEN TITLEBAR IS DRAGGED DURING MAXIMIZED
 		// titleBar.addMouseListener(new MouseAdapter() {
-		// 	@Override
-		// 	public void mousePressed(MouseEvent e) {
-		// 		if (parentFrame != null && (parentFrame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
-		// 			wasMaximizedOnDrag = true;
-		// 			initialClickPoint = e.getPoint(); // capture where the user clicked
-		// 		} else {
-		// 			wasMaximizedOnDrag = false;
-		// 			initialClickPoint = null;
-		// 		}
-		// 	}
+		// @Override
+		// public void mousePressed(MouseEvent e) {
+		// if (parentFrame != null && (parentFrame.getExtendedState() &
+		// JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
+		// wasMaximizedOnDrag = true;
+		// initialClickPoint = e.getPoint(); // capture where the user clicked
+		// } else {
+		// wasMaximizedOnDrag = false;
+		// initialClickPoint = null;
+		// }
+		// }
 		// });
 
 		// titleBar.addMouseMotionListener(new MouseMotionAdapter() {
-		// 	@Override
-		// 	public void mouseDragged(MouseEvent e) {
-		// 		if (parentFrame != null && wasMaximizedOnDrag) {
-		// 			Point mouseScreen = e.getLocationOnScreen();
+		// @Override
+		// public void mouseDragged(MouseEvent e) {
+		// if (parentFrame != null && wasMaximizedOnDrag) {
+		// Point mouseScreen = e.getLocationOnScreen();
 
-		// 			// Restore window first
-		// 			parentFrame.setExtendedState(JFrame.NORMAL);
+		// // Restore window first
+		// parentFrame.setExtendedState(JFrame.NORMAL);
 
-		// 			// Restore previous size
-		// 			int width = previousSize.width;
-		// 			int height = previousSize.height;
-		// 			parentFrame.setSize(width, height);
+		// // Restore previous size
+		// int width = previousSize.width;
+		// int height = previousSize.height;
+		// parentFrame.setSize(width, height);
 
-		// 			// Set window location so the mouse is centered in the window
-		// 			int newX = mouseScreen.x - width / 2;
-		// 			int newY = mouseScreen.y - header.getHeight() / 2;
-		// 			parentFrame.setLocation(newX, newY);
+		// // Set window location so the mouse is centered in the window
+		// int newX = mouseScreen.x - width / 2;
+		// int newY = mouseScreen.y - header.getHeight() / 2;
+		// parentFrame.setLocation(newX, newY);
 
-		// 			wasMaximizedOnDrag = false;
-		// 		}
-		// 	}
+		// wasMaximizedOnDrag = false;
+		// }
+		// }
 		// });
 
 		// Listeners
@@ -259,6 +260,7 @@ public class Main extends JPanel {
 		frame.setContentPane(wrapper);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		frame.setMinimumSize(new Dimension(400, 400));
 
 		ComponentResizer cr = new ComponentResizer();
 		cr.registerComponent(frame);
@@ -266,6 +268,7 @@ public class Main extends JPanel {
 
 }
 
-
-// HELPER CLASSES REPOSITORY: https://github.com/rising-dancho/tips4java/tree/main/source
-// tips4java forum: https://tips4java.wordpress.com/category/package/swing/page/3/
+// HELPER CLASSES REPOSITORY:
+// https://github.com/rising-dancho/tips4java/tree/main/source
+// tips4java forum:
+// https://tips4java.wordpress.com/category/package/swing/page/3/
