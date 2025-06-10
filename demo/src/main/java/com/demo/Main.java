@@ -29,12 +29,8 @@ public class Main extends JPanel {
 		componentMover = new ComponentMover(Window.class);
 
 		setLayout(new BorderLayout());
-
-		// Only add the title bar at the top
 		JComponent top = createTopPanel();
 		add(top, BorderLayout.NORTH);
-
-		// No other components are added!
 	}
 
 	private JComponent createTopPanel() {
@@ -56,7 +52,6 @@ public class Main extends JPanel {
 		// Header
 		header = new JPanel();
 		header.setBackground(new java.awt.Color(36, 37, 38));
-		header.setMinimumSize(new java.awt.Dimension(400, 40));
 		header.setPreferredSize(new java.awt.Dimension(300, 40));
 		header.setLayout(new BorderLayout());
 
@@ -105,45 +100,6 @@ public class Main extends JPanel {
 				}
 			}
 		});
-
-		// COLLAPSE WINDOW WHEN TITLEBAR IS DRAGGED DURING MAXIMIZED
-		// titleBar.addMouseListener(new MouseAdapter() {
-		// @Override
-		// public void mousePressed(MouseEvent e) {
-		// if (parentFrame != null && (parentFrame.getExtendedState() &
-		// JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
-		// wasMaximizedOnDrag = true;
-		// initialClickPoint = e.getPoint(); // capture where the user clicked
-		// } else {
-		// wasMaximizedOnDrag = false;
-		// initialClickPoint = null;
-		// }
-		// }
-		// });
-
-		// titleBar.addMouseMotionListener(new MouseMotionAdapter() {
-		// @Override
-		// public void mouseDragged(MouseEvent e) {
-		// if (parentFrame != null && wasMaximizedOnDrag) {
-		// Point mouseScreen = e.getLocationOnScreen();
-
-		// // Restore window first
-		// parentFrame.setExtendedState(JFrame.NORMAL);
-
-		// // Restore previous size
-		// int width = previousSize.width;
-		// int height = previousSize.height;
-		// parentFrame.setSize(width, height);
-
-		// // Set window location so the mouse is centered in the window
-		// int newX = mouseScreen.x - width / 2;
-		// int newY = mouseScreen.y - header.getHeight() / 2;
-		// parentFrame.setLocation(newX, newY);
-
-		// wasMaximizedOnDrag = false;
-		// }
-		// }
-		// });
 
 		// Listeners
 		attachControlListeners();
@@ -260,7 +216,7 @@ public class Main extends JPanel {
 		frame.setContentPane(wrapper);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		frame.setMinimumSize(new Dimension(400, 400));
+		frame.setMinimumSize(new Dimension(475, 300));
 
 		ComponentResizer cr = new ComponentResizer();
 		cr.registerComponent(frame);
