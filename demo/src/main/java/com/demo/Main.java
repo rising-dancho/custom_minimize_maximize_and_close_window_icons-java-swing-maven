@@ -67,7 +67,7 @@ public class Main extends JFrame {
         exitItem.setBorder(BorderFactory.createEmptyBorder());
 
         // SET THE FONT COLOR OF THE MENU
-        fileMenu.setForeground(Color.WHITE);
+        fileMenu.setForeground(new Color(157, 157, 157));
         newItem.setForeground(new Color(36, 37, 38));
         openItem.setForeground(new Color(36, 37, 38));
         exitItem.setForeground(new Color(36, 37, 38));
