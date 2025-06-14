@@ -3,47 +3,90 @@ package com.demo;
 import java.awt.*;
 import javax.swing.*;
 
-public class Main extends JPanel {
-	static private int windowWidth = 1024;
-	static private int windowHeight = 768;
+public class Main extends JFrame {
+	static String PACKAGE_NAME = "demo";
+	static ImageIcon logo = new ImageIcon(Main.class.getResource("/" + PACKAGE_NAME + "/images/logo/logo.png"));
+	static JMenuBar menuBar = new JMenuBar();
+	static JMenu fileMenu = new JMenu("File");
+	static JMenuItem newItem = new JMenuItem("New");
+	static JMenuItem openItem = new JMenuItem("Open");
+	static JMenuItem exitItem = new JMenuItem("Exit");
+
+	JPanel container = new JPanel();
+	JLabel label1 = new JLabel();
 
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(Main::createAndShowGUI);
+		new Main();
 	}
 
-	public static void createAndShowGUI() {
-		JFrame frame = new JFrame();
-		frame.setUndecorated(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(windowWidth, windowHeight);
+	public Main() {
+		// Window setup
+		this.setTitle("Demo");
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setIconImage(logo.getImage());
+		this.setSize(1080, 720);
+		this.setUndecorated(true);
+		this.getContentPane().setBackground(new Color(0x1F1F1F));
 
-		// Create main content panel
-		Main demo = new Main();
-
-		// Create wrapper panel with BorderLayout
-		JPanel wrapper = new JPanel(new BorderLayout());
-		wrapper.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		// Wrapper panel (acts as root layout manager)
+		JPanel wrapper = new JPanel();
+		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
 		wrapper.setBackground(new Color(36, 37, 38));
 
-		// Create and add the custom title bar
+		// ============ TITLE BAR ============
 		CustomTitleBar titleBar = new CustomTitleBar(
-				frame,
+				this,
 				"Demo",
-				"/demo/images/logo/logo_24x24.png", // Make sure this path is valid!
+				PACKAGE_NAME,
+				"/" + PACKAGE_NAME + "/images/logo/logo_24x24.png",
 				new Color(36, 37, 38),
 				40);
-		wrapper.add(titleBar, BorderLayout.NORTH);
+		wrapper.add(titleBar);
 
-		// Add main content
-		wrapper.add(demo, BorderLayout.CENTER);
+		// ============ MENU BAR ============
+		// menuBar.setBackground(new Color(36, 37, 38));
+		menuBar.setForeground(Color.WHITE);
 
-		// Set wrapper as the content pane
-		frame.setContentPane(wrapper);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-		frame.setMinimumSize(new Dimension(475, 300));
+		// Menu panel wraps the menu bar so it stretches fully
+		JPanel menuPanel = new JPanel(new BorderLayout());
+		menuPanel.setBackground(new Color(36, 37, 38));
+		menuPanel.add(menuBar, BorderLayout.CENTER);
 
+		// Add "File" menu and items
+		exitItem.addActionListener(e -> System.exit(0));
+		fileMenu.add(newItem);
+		fileMenu.add(openItem);
+		fileMenu.addSeparator();
+		fileMenu.add(exitItem);
+		menuBar.add(fileMenu);
+
+		// Set fixed height for the menu panel
+		menuPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 30));
+		menuPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30)); // restrict vertical size
+		menuPanel.setMinimumSize(new Dimension(0, 30));
+		wrapper.add(menuPanel);
+
+		// ============ MAIN CONTENT ============
+		container.setBackground(new Color(0x1F1F1F));
+		label1.setText("Welcome To The Homepage!");
+		label1.setForeground(new Color(0xEEEEEE));
+		container.add(label1);
+		wrapper.add(container);
+
+		// Set wrapper as content pane
+		this.setContentPane(wrapper);
+
+		// Center the window
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		int xPos = (dim.width - this.getWidth()) / 2;
+		int yPos = (dim.height - this.getHeight()) / 2;
+		this.setLocation(xPos, yPos);
+
+		// Enable resizing
 		ComponentResizer cr = new ComponentResizer();
-		cr.registerComponent(frame);
+		cr.registerComponent(this);
+
+		// Show the window
+		this.setVisible(true);
 	}
 }
