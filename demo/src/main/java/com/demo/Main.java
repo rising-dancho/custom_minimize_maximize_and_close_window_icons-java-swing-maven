@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 
 public class Main extends JPanel {
-	private ComponentMover componentMover;
+	// private ComponentMover componentMover;
 
 	private JPanel header;
 	private JButton closeButton;
@@ -23,10 +23,15 @@ public class Main extends JPanel {
 
 	public void setParentFrame(JFrame frame) {
 		this.parentFrame = frame;
+
+		// Attach SimpleDragger now that frame is available
+		if (header != null) {
+			new TitlebarMover(this.parentFrame, header);
+		}
 	}
 
 	Main() {
-		componentMover = new ComponentMover(Window.class);
+		// componentMover = new ComponentMover(Window.class);
 
 		setLayout(new BorderLayout());
 		JComponent top = createTopPanel();
@@ -35,7 +40,7 @@ public class Main extends JPanel {
 
 	private JComponent createTopPanel() {
 		JPanel titleBar = new JPanel(new BorderLayout());
-		componentMover.registerComponent(titleBar);
+		// componentMover.registerComponent(titleBar);
 
 		JLabel title = new JLabel("Demo");
 		ImageIcon icon = new ImageIcon(getClass().getResource("/demo/images/logo/logo_24x24.png"));
