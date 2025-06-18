@@ -4,103 +4,126 @@ import java.awt.*;
 import javax.swing.*;
 
 public class Main extends JFrame {
-    static String PACKAGE_NAME = "demo";
-    static ImageIcon logo = new ImageIcon(Main.class.getResource("/" + PACKAGE_NAME + "/images/logo/logo.png"));
-    static JMenuBar menuBar = new JMenuBar();
-    static JMenu fileMenu = new JMenu("File");
-    static JMenuItem newItem = new JMenuItem("New");
-    static JMenuItem openItem = new JMenuItem("Open");
-    static JMenuItem exitItem = new JMenuItem("Exit");
 
-    JPanel container = new JPanel();
-    JLabel label1 = new JLabel();
+    // ─── Static Resources ──────────────────────────────────────────────────────
+    private static final String PACKAGE_NAME = "demo";
+    private static final ImageIcon LOGO = new ImageIcon(
+            Main.class.getResource("/" + PACKAGE_NAME + "/images/logo/logo.png"));
+
+    private static final JMenuBar menuBar = new JMenuBar();
+    private static final JMenu fileMenu = new JMenu("File");
+    private static final JMenuItem newItem = new JMenuItem("New");
+    private static final JMenuItem openItem = new JMenuItem("Open");
+    private static final JMenuItem exitItem = new JMenuItem("Exit");
+
+    // ─── Instance UI Parts ─────────────────────────────────────────────────────
+    private final JPanel container = new JPanel();
+    private final JLabel label1 = new JLabel("Welcome To The Homepage!");
 
     public static void main(String[] args) {
-        new Main();
+        SwingUtilities.invokeLater(Main::new);
     }
 
     public Main() {
-        // Window setup
-        this.setTitle("Demo");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setIconImage(logo.getImage());
-        this.setSize(1080, 720);
-        this.setUndecorated(true);
-        this.getContentPane().setBackground(new Color(0x1F1F1F));
+        // ── 1. Frame ----------------------------------------------------------------
+        setTitle("demo");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setIconImage(LOGO.getImage());
+        setSize(1080, 720);
+        setUndecorated(true);
+        getContentPane().setBackground(new Color(0x1F1F1F));
+        setSize(1080, 720);
 
-        // Wrapper panel (acts as root layout manager)
+        // 🟢 Initial rounded shape
+        setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
+
+        // 🟢 Listen for resizes to reapply rounded shape
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                setShape(new java.awt.geom.RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
+            }
+        });
+
+        // ── 2. Root Wrapper ---------------------------------------------------------
         JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        wrapper.setLayout(new BorderLayout());
         wrapper.setBackground(new Color(36, 37, 38));
+        wrapper.setOpaque(true);
 
-        // ============ TITLE BAR ============
+        // ── 3. Custom Title Bar -----------------------------------------------------
         CustomTitleBar titleBar = new CustomTitleBar(
                 this,
-                "Demo",
+                "demo",
                 PACKAGE_NAME,
                 "/" + PACKAGE_NAME + "/images/logo/logo_24x24.png",
                 new Color(36, 37, 38),
                 40);
-        wrapper.add(titleBar);
 
-        // ============ MENU BAR ============
+        // FOR DEBUGGING PURPOSES ONLY
+        // titleBar.setBorder(BorderFactory.createLineBorder(Color.RED));
+
+        // small transparent insets so the resize “hot zone” is reachable
+        JPanel titleWrapper = new JPanel(new BorderLayout());
+        titleWrapper.setOpaque(false);
+        titleWrapper.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        titleWrapper.add(titleBar, BorderLayout.CENTER);
+
+        // ── 4. Menu Bar -------------------------------------------------------------
         menuBar.setBackground(new Color(36, 37, 38));
         menuBar.setBorder(BorderFactory.createEmptyBorder());
-        menuBar.setForeground(new Color(36, 37, 38));
 
-        // Menu panel wraps the menu bar so it stretches fully
-        JPanel menuPanel = new JPanel(new BorderLayout());
-        menuPanel.setBackground(new Color(36, 37, 38));
-        menuPanel.add(menuBar, BorderLayout.CENTER);
-
-        // Add "File" menu and items
         exitItem.addActionListener(e -> System.exit(0));
         fileMenu.add(newItem);
         fileMenu.add(openItem);
         fileMenu.addSeparator();
         fileMenu.add(exitItem);
-
-        // REMOVE ALL BORDER FROM THE MENU (Flat design)
         fileMenu.setBorder(BorderFactory.createEmptyBorder());
-        newItem.setBorder(BorderFactory.createEmptyBorder());
-        openItem.setBorder(BorderFactory.createEmptyBorder());
-        exitItem.setBorder(BorderFactory.createEmptyBorder());
-
-        // SET THE FONT COLOR OF THE MENU
         fileMenu.setForeground(new Color(157, 157, 157));
-        newItem.setForeground(new Color(36, 37, 38));
-        openItem.setForeground(new Color(36, 37, 38));
-        exitItem.setForeground(new Color(36, 37, 38));
-
         menuBar.add(fileMenu);
 
-        // Set fixed height for the menu panel
-        menuPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 30));
-        menuPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30)); // restrict vertical size
+        JPanel menuPanel = new JPanel(new BorderLayout());
+        menuPanel.setBackground(new Color(36, 37, 38));
+        menuPanel.add(menuBar, BorderLayout.CENTER);
+        menuPanel.setPreferredSize(new Dimension(0, 30));
+        menuPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        menuPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         menuPanel.setMinimumSize(new Dimension(0, 30));
-        wrapper.add(menuPanel);
 
-        // ============ MAIN CONTENT ============
+        // FOR DEBUGGING PURPOSES ONLY
+        // menuPanel.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+
+        // ── 5. Main Content Panel ---------------------------------------------------
         container.setBackground(new Color(0x1F1F1F));
-        label1.setText("Welcome To The Homepage!");
         label1.setForeground(new Color(0xEEEEEE));
         container.add(label1);
-        wrapper.add(container);
 
-        // Set wrapper as content pane
-        this.setContentPane(wrapper);
+        // FOR DEBUGGING PURPOSES ONLY
+        // container.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
-        // Center the window
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        int xPos = (dim.width - this.getWidth()) / 2;
-        int yPos = (dim.height - this.getHeight()) / 2;
-        this.setLocation(xPos, yPos);
+        // ── 6. Compose --------------------------------------------------------------
+        setContentPane(wrapper);
 
-        // Enable resizing
-        ComponentResizer cr = new ComponentResizer();
-        cr.registerComponent(this);
+        // vertical box to hold both menu and container
+        JPanel centerContent = new JPanel();
 
-        // Show the window
-        this.setVisible(true);
+        centerContent.setLayout(new BoxLayout(centerContent, BoxLayout.Y_AXIS));
+        centerContent.setBackground(new Color(36, 37, 38));
+        centerContent.add(menuPanel);
+        centerContent.add(container);
+
+        // compose final layout
+        wrapper.add(titleWrapper, BorderLayout.NORTH);
+        wrapper.add(centerContent, BorderLayout.CENTER);
+
+        // ── 7. Center on screen -----------------------------------------------------
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation((screen.width - getWidth()) / 2, (screen.height - getHeight()) / 2);
+
+        // ── 8. Enable edge resizing -------------------------------------------------
+        ComponentResizer resizer = new ComponentResizer();
+        resizer.registerComponent(this);
+
+        setVisible(true);
     }
 }

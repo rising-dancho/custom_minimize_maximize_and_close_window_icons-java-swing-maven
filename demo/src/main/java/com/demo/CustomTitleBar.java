@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class CustomTitleBar extends JPanel {
+
   private final JFrame frame;
   private final JLabel titleLabel;
   private final JButton closeButton;
@@ -12,13 +13,19 @@ public class CustomTitleBar extends JPanel {
   private final JButton maximizeButton;
   private final JPanel controlPanel;
 
-  static int BTN_HEIGHT;
-  static String PACKAGE_NAME;
-
   private Dimension previousSize;
 
-  public CustomTitleBar(JFrame frame, String title, String packageName, String iconPath, Color background, int height) {
-    BTN_HEIGHT = height;
+  // package‑level config
+  private static String PACKAGE_NAME;
+
+  public CustomTitleBar(JFrame frame,
+      String title,
+      String packageName,
+      String iconPath,
+      Color background,
+      int height) {
+
+    // ── store static config so createButton() can access it
     PACKAGE_NAME = packageName;
 
     this.frame = frame;
@@ -27,17 +34,21 @@ public class CustomTitleBar extends JPanel {
     setLayout(new BorderLayout());
     setBackground(background);
 
-    // Fix height properly
-    Dimension fixedSize = new Dimension(Integer.MAX_VALUE, height);
+    // fixed height; allow width to stretch but avoid Integer.MAX_VALUE weirdness
+    Dimension fixedSize = new Dimension(new Dimension(Integer.MAX_VALUE, 40));
     setPreferredSize(fixedSize);
-    setMaximumSize(fixedSize); // ← This is what stops vertical expansion
-    setMinimumSize(new Dimension(0, height)); // optional
+    setMaximumSize(fixedSize);
+    setMinimumSize(new Dimension(0, height));
 
-    // Title with optional icon
+    // debug: red border already added from Main, but we can keep this too
+    // setBorder(BorderFactory.createLineBorder(Color.RED));
+
+    // ── Title label (optional icon) --------------------------------------------
     titleLabel = new JLabel(title);
     titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
     titleLabel.setForeground(Color.WHITE);
     titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+    titleLabel.setVerticalAlignment(SwingConstants.CENTER);
 
     if (iconPath != null) {
       ImageIcon icon = new ImageIcon(getClass().getResource(iconPath));
@@ -45,49 +56,69 @@ public class CustomTitleBar extends JPanel {
       titleLabel.setIconTextGap(10);
     }
 
-    // Button Panel
-    controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 5));
+    // ── Control buttons ---------------------------------------------------------
+    controlPanel = new JPanel();
+    controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
+    controlPanel.setOpaque(false);
     controlPanel.setOpaque(false);
 
-    minimizeButton = createButton("minimize_def.png", "minimize_hover.png", e -> frame.setState(JFrame.ICONIFIED));
-    maximizeButton = createButton("maximize_def.png", "maximize_hover.png", e -> toggleMaximize());
-    closeButton = createButton("close_def.png", "close_hover.png", e -> System.exit(0));
+    minimizeButton = createButton("minimize_def.png", "minimize_hover.png",
+        e -> frame.setState(JFrame.ICONIFIED));
+
+    maximizeButton = createButton("maximize_def.png", "maximize_hover.png",
+        e -> toggleMaximize());
+
+    closeButton = createButton("close_def.png", "close_hover.png",
+        e -> System.exit(0));
 
     controlPanel.add(minimizeButton);
     controlPanel.add(maximizeButton);
     controlPanel.add(closeButton);
 
-    add(titleLabel, BorderLayout.WEST);
+    JPanel centerPanel = new JPanel(new BorderLayout());
+    centerPanel.setOpaque(false);
+    centerPanel.add(titleLabel, BorderLayout.WEST);
+
+    add(centerPanel, BorderLayout.CENTER);
     add(controlPanel, BorderLayout.EAST);
 
-    // Enable dragging
+    // ── Enable dragging ---------------------------------------------------------
     new TitlebarMover(frame, this);
   }
 
-  private JButton createButton(String defIcon, String hoverIcon, ActionListener action) {
-    JButton button = new JButton(new ImageIcon(getClass().getResource("/" + PACKAGE_NAME + "/images/" + defIcon)));
-    button.setPreferredSize(new Dimension(BTN_HEIGHT, BTN_HEIGHT));
-    button.setBorderPainted(false);
-    button.setFocusPainted(false);
-    button.setContentAreaFilled(false);
-    button.setToolTipText(defIcon.split("_")[0].substring(0, 1).toUpperCase() + defIcon.split("_")[0].substring(1));
+  // ------------------------------------------------------------------ utilities
+  private JButton createButton(String defIcon,
+      String hoverIcon,
+      ActionListener action) {
 
-    button.addActionListener(action);
-    button.addMouseListener(new MouseAdapter() {
+    JButton b = new JButton(new ImageIcon(
+        getClass().getResource("/" + PACKAGE_NAME + "/images/" + defIcon)));
+    int size = 32; // or 32 depending on your icons
+    b.setPreferredSize(new Dimension(size, size));
+    b.setBorderPainted(false);
+    b.setFocusPainted(false);
+    b.setContentAreaFilled(false);
+    b.setToolTipText(defIcon.split("_")[0]); // quick tooltip
+
+    b.addActionListener(action);
+    b.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(MouseEvent e) {
-        button.setIcon(new ImageIcon(getClass().getResource("/" + PACKAGE_NAME + "/images/" + hoverIcon)));
+        b.setIcon(new ImageIcon(getClass().getResource(
+            "/" + PACKAGE_NAME + "/images/" + hoverIcon)));
       }
 
       @Override
       public void mouseExited(MouseEvent e) {
-        button.setIcon(new ImageIcon(getClass().getResource("/" + PACKAGE_NAME + "/images/" + defIcon)));
+        b.setIcon(new ImageIcon(getClass().getResource(
+            "/" + PACKAGE_NAME + "/images/" + defIcon)));
       }
     });
-
-    return button;
+    return b;
   }
 
+  // ---------------------------------------------------------------- maximize
+  // logic
   private void toggleMaximize() {
     if ((frame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH) {
       frame.setExtendedState(JFrame.NORMAL);
@@ -101,23 +132,28 @@ public class CustomTitleBar extends JPanel {
 
   private void updateMaximizeIcon() {
     boolean maximized = (frame.getExtendedState() & JFrame.MAXIMIZED_BOTH) == JFrame.MAXIMIZED_BOTH;
+
     String def = maximized ? "collapse_def.png" : "maximize_def.png";
     String hover = maximized ? "collapse_hover.png" : "maximize_hover.png";
-    maximizeButton.setIcon(new ImageIcon(getClass().getResource("/" + PACKAGE_NAME + "/images/" + def)));
+    maximizeButton.setIcon(new ImageIcon(
+        getClass().getResource("/" + PACKAGE_NAME + "/images/" + def)));
 
-    for (MouseListener l : maximizeButton.getMouseListeners()) {
-      if (l instanceof MouseAdapter)
-        maximizeButton.removeMouseListener(l);
+    // refresh hover behaviour
+    for (MouseListener ml : maximizeButton.getMouseListeners()) {
+      if (ml instanceof MouseAdapter)
+        maximizeButton.removeMouseListener(ml);
     }
     maximizeButton.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(MouseEvent e) {
-        maximizeButton.setIcon(new ImageIcon(getClass().getResource("/" + PACKAGE_NAME + "/images/" + hover)));
+        maximizeButton.setIcon(new ImageIcon(getClass().getResource(
+            "/" + PACKAGE_NAME + "/images/" + hover)));
       }
 
       @Override
       public void mouseExited(MouseEvent e) {
-        maximizeButton.setIcon(new ImageIcon(getClass().getResource("/" + PACKAGE_NAME + "/images/" + def)));
+        maximizeButton.setIcon(new ImageIcon(getClass().getResource(
+            "/" + PACKAGE_NAME + "/images/" + def)));
       }
     });
   }
